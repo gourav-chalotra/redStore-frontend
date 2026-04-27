@@ -1,7 +1,7 @@
 // Change this to your Render backend URL after deployment (e.g., https://your-app.onrender.com/api)
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:5001/api'
-    : 'https://shoe-store-backend.onrender.com/api'; // Replace with your actual Render URL
+    : 'https://redstore-backend-a5vl.onrender.com/api'; // Live Render backend URL
 
 // Cart Logic
 let cart = JSON.parse(localStorage.getItem('redstore_cart')) || [];
