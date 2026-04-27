@@ -1,5 +1,5 @@
 // Change this to your Render backend URL after deployment (e.g., https://your-app.onrender.com/api)
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const API_URL = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname)
     ? 'http://localhost:5001/api'
     : 'https://redstore-backend-a5vl.onrender.com/api'; // Live Render backend URL
 
@@ -118,6 +118,7 @@ async function handleRegister(e) {
     const password = e.target[2].value;
 
     try {
+        console.log(`Attempting fetch to: ${API_URL}/register`);
         const res = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -128,11 +129,15 @@ async function handleRegister(e) {
             alert('Registration successful! Please login.');
             login(); // Switch to login form
         } else {
-            alert(data.error);
+            alert(data.error || 'Registration failed');
         }
     } catch (err) {
         console.error('Registration Error:', err);
-        alert('Server Error: ' + err.message + '\nCheck console for details.');
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+            alert('CORS or Network Error: Could not connect to the backend.\n1. Ensure the backend is running.\n2. Check if the URL is correct: ' + API_URL);
+        } else {
+            alert('Server Error: ' + err.message);
+        }
     }
 }
 
@@ -147,6 +152,7 @@ async function handleLogin(e) {
     const password = e.target[1].value;
 
     try {
+        console.log(`Attempting login to: ${API_URL}/login`);
         const res = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -159,13 +165,17 @@ async function handleLogin(e) {
             alert(`Welcome back, ${data.user.username}! Redirecting to home...`);
             window.location.href = 'index.html';
         } else {
-            alert(data.error);
+            alert(data.error || 'Login failed');
             btn.innerText = originalText;
             btn.disabled = false;
         }
     } catch (err) {
         console.error('Login Error:', err);
-        alert('Server Error: ' + err.message);
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+            alert('CORS or Network Error: Could not connect to the backend.\nCheck if the server is running at: ' + API_URL);
+        } else {
+            alert('Server Error: ' + err.message);
+        }
         btn.innerText = originalText;
         btn.disabled = false;
     }
@@ -241,6 +251,7 @@ async function saveProfile() {
     };
 
     try {
+        console.log(`Attempting profile update to: ${API_URL}/update-profile`);
         const res = await fetch(`${API_URL}/update-profile`, {
             method: 'PUT',
             headers: { 
@@ -254,10 +265,11 @@ async function saveProfile() {
             localStorage.setItem('redstore_user', JSON.stringify(data.user));
             alert('Profile updated successfully in Database!');
         } else {
-            alert(data.error);
+            alert(data.error || 'Update failed');
         }
     } catch (err) {
-        alert('Server Error: Could not save profile');
+        console.error('Profile Update Error:', err);
+        alert('Server Error: Could not save profile. Check connection to ' + API_URL);
     }
 }
 
