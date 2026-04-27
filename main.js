@@ -131,7 +131,8 @@ async function handleRegister(e) {
             alert(data.error);
         }
     } catch (err) {
-        alert('Server Error');
+        console.error('Registration Error:', err);
+        alert('Server Error: ' + err.message + '\nCheck console for details.');
     }
 }
 
@@ -163,7 +164,8 @@ async function handleLogin(e) {
             btn.disabled = false;
         }
     } catch (err) {
-        alert('Server Error');
+        console.error('Login Error:', err);
+        alert('Server Error: ' + err.message);
         btn.innerText = originalText;
         btn.disabled = false;
     }
